@@ -1,5 +1,5 @@
 # Discord-AppImage
-AppImage builds for [Discord, Discord PTB, and Discord Canary](https://discordapp.com)
+AppImage builds for [Discord Stable](https://discordapp.com)
 
 To use an AppImage, just download it, `chmod a+x` the AppImage file, then run it!
 
