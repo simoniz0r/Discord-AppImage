@@ -198,6 +198,8 @@ discord_update() {
         echo "$version_upper is up to date."
         # run with --disable-gpu-sandbox to work around bug with Electron and glibc 2.34
         "$running_dir"/"$version_lower" --disable-gpu-sandbox "$@"
+        # sleep so that internal update process works
+        sleep 30
         exit
     fi
     # versions did not match, so build new AppImage
