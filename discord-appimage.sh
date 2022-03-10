@@ -103,7 +103,7 @@ discord_setup() {
     cp "$HOME"/.cache/"$version_lower"-appimage/AppDir/usr/share/"$version_lower"/discord.png \
     "$HOME"/.cache/"$version_lower"-appimage/AppDir/"$version_lower".png
     # download and extract Discord's deps
-    deps=(libnotify4 libxss1 libxtst6 libappindicator1 libnspr4 libnss3 libgconf-2-4)
+    deps=(libnotify4 libxss1 libxtst6 libappindicator1 libnspr4 libnss3 libgconf-2-4 libatomic1)
     for dep in "${deps[@]}"; do
         discord_dldeps "$dep"
         discord_extractdebs "$dep.deb"
