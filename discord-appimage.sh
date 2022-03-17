@@ -12,7 +12,7 @@ discord_msg() {
         msg) msg_type="message";;
         question) msg_type="question";;
     esac
-    fltk-dialog --title="$version_upper AppImage" --close-label="OK" --center --system-colors --"$msg_type" --text="$1"
+    fltk-dialog --title="$version_upper AppImage" --close-label="OK" --center --"$msg_type" --text="$1"
 }
 
 # function to handle exits
@@ -166,7 +166,6 @@ discord_buildappimage() {
         sudo_pass="$(fltk-dialog --title="$version_upper AppImage" \
         --close-label="OK" \
         --center \
-        --system-colors \
         --password \
         --text="Authentication is needed to move the $version_upper AppImage to '$save_dir'")"
         echo "$sudo_pass" | sudo -S mkdir -p "$save_dir" || discord_error "Error creating directory '$save_dir'" "1"
@@ -214,7 +213,6 @@ discord_update() {
     # show progress bar while building AppImage
     fltk-dialog --title="$version_upper AppImage" \
     --center \
-    --system-colors \
     --progress \
     --pulsate \
     --no-cancel \
