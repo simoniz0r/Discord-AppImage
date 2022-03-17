@@ -8,7 +8,7 @@
 # function to display messages
 discord_msg() {
     case "$2" in
-        error) msg_type="error";;
+        error) msg_type="message";;
         msg) msg_type="message";;
         question) msg_type="question";;
     esac
