@@ -103,7 +103,7 @@ discord_setup() {
     cp "$HOME"/.cache/"$version_lower"-appimage/AppDir/usr/share/"$version_lower"/discord.png \
     "$HOME"/.cache/"$version_lower"-appimage/AppDir/"$version_lower".png
     # download and extract Discord's deps
-    deps=(libnotify4 libxss1 libxtst6 libappindicator1 libnspr4 libnss3 libgconf-2-4 libatomic1)
+    deps=(binutils libnotify4 libxss1 libxtst6 libappindicator1 libnspr4 libnss3 libgconf-2-4 libatomic1)
     for dep in "${deps[@]}"; do
         discord_dldeps "$dep"
         discord_extractdebs "$dep.deb"
@@ -198,8 +198,14 @@ discord_update() {
         echo "$version_upper is up to date."
         # run with --disable-gpu-sandbox to work around bug with Electron and glibc 2.34
         "$running_dir"/"$version_lower" --disable-gpu-sandbox "$@"
-        # sleep so that internal update process works
-        sleep 30
+        # while loop that sleeps so that internal update process works
+        while true; do
+            sleep 30
+            # break if Discord is not running
+            if ! ps -x | grep -q "[/]$version_lower/Discord"; then
+                break
+            fi
+        done
         exit
     fi
     # versions did not match, so build new AppImage
