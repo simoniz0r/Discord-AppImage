@@ -297,7 +297,7 @@ discord_update() {
     discord_buildappimage
     # run new AppImage, fork it to background, and exit
     cd "$HOME"
-    "$save_dir"/"$version_lower" --disable-gpu-sandbox "$@" & disown
+    "$save_dir"/"$version_lower" "$@" & disown
     exit 0
 }
 
@@ -349,7 +349,7 @@ fi
 # check arguments
 case "$1" in
     build-distrib) # build AppImage for distribution that doesn't actually contain Discord
-        latest_ver="Distributable AppImage"
+        export latest_ver="Distributable AppImage"
         case "$2" in
             *ptb) # Discord PTB
                 export version_lower="discord-ptb"
