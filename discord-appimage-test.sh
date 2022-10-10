@@ -227,9 +227,11 @@ discord_buildappimage() {
             mkdir -p "$HOME"/.local/share/icons/hicolor/256x256/apps
             rm -rf "$HOME"/.local/share/applications/"$version_lower".desktop
             rm -rf "$HOME"/.local/share/icons/hicolor/256x256/apps/"$version_lower".png
-            cp "$running_dir"/../share/"$version_lower"/"$version_lower".desktop "$HOME"/.local/share/applications/"$version_lower".desktop || \
+            cp "$HOME"/.cache/"$version_lower"-appimage/AppDir/usr/share/"$version_lower"/"$version_lower".desktop \
+            "$HOME"/.local/share/applications/"$version_lower".desktop || \
             discord_error "Error copying '$version_lower.desktop' to '$HOME/.local/share/applications/$version_lower.desktop'" "1"
-            cp "$running_dir"/../share/"$version_lower"/discord.png "$HOME"/.local/share/icons/hicolor/256x256/apps/"$version_lower".png || \
+            cp "$HOME"/.cache/"$version_lower"-appimage/AppDir/usr/share/"$version_lower"/discord.png \
+            "$HOME"/.local/share/icons/hicolor/256x256/apps/"$version_lower".png || \
             discord_error "Error copying 'discord.png' to '$HOME/.local/share/icons/hicolor/256x256/apps/$version_lower.png'" "1"
             # fix Exec and Icon lines in .desktop file
             sed -i "s%^Exec=.*%Exec=$save_dir/$version_lower%g" \
