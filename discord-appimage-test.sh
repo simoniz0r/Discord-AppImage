@@ -77,7 +77,7 @@ discord_setup() {
     mkdir -p "$HOME"/.cache/"$version_lower"-appimage/AppDir/usr/bin
     # download discord-appimage.sh script to AppDir bin
     # curl -skL "file:///home/syretia/git/Discord-AppImage/discord-appimage-test.sh" \
-    curl -skL "https://github.com/simoniz0r/Discord-AppImage/raw/main/discord-appimage-test.sh" \
+    curl -skL "https://github.com/simoniz0r/Discord-AppImage/raw/master/discord-appimage-test.sh" \
     -o "$HOME"/.cache/"$version_lower"-appimage/AppDir/usr/bin/discord-runner || \
     discord_error "Error downloading discord-appimage.sh" "1"
     chmod +x "$HOME"/.cache/"$version_lower"-appimage/AppDir/usr/bin/discord-runner
