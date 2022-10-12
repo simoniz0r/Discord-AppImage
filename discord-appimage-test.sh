@@ -220,7 +220,7 @@ discord_buildappimage() {
     fi
     # if being ran from distributable AppImage, ask to create menu entry
     if [[ "$discord_build_full" == "true" && ! -d "$running_dir/../share/$version_lower" ]]; then
-        discord_msg "Finished building Appimage for $version_upper version '$latest_ver' to '$save_dir/$version_lower'.\n\nWould you like to create a menu entry for $version_upper?\n\n" "question"
+        discord_msg "Finished building AppImage for $version_upper version '$latest_ver' to '$save_dir/$version_lower'.\n\nWould you like to create a menu entry for $version_upper?\n\n" "question"
         if [[ "$?" == "0" ]]; then
             # copy desktop file and icon to ~/.local
             mkdir -p "$HOME"/.local/share/applications
@@ -238,11 +238,12 @@ discord_buildappimage() {
             "$HOME"/.local/share/applications/"$version_lower".desktop
             sed -i "s%^Icon=.*%Icon=$HOME/.local/share/icons/hicolor/256x256/apps/$version_lower.png%g" \
             "$HOME"/.local/share/applications/"$version_lower".desktop
-            discord_msg "$version_upper desktop file and icon have been copied to '"$HOME"/.local/share'.\nYou can run '$save_dir/$version_lower uninstall' if you would like to remove them later." "message"
-        # TODO add message about Discord starting and removing this AppImage
+            discord_msg "$version_upper desktop file and icon have been copied to '"$HOME"/.local/share'.\nYou can run '$save_dir/$version_lower uninstall' if you would like to remove them later.\n$version_upper will now start. This AppImage is no longer required and can be removed." "message"
+        else
+            discord_msg "$version_upper will now start. This AppImage is no longer required and can be removed." "message"
         fi
     else
-        discord_msg "Finished building Appimage for $version_upper version '$latest_ver'." "message"
+        discord_msg "Finished building AppImage for $version_upper version '$latest_ver'." "message"
     fi
     rm -rf "$HOME"/.cache/"$version_lower"-appimage
 }
