@@ -239,6 +239,7 @@ discord_buildappimage() {
             sed -i "s%^Icon=.*%Icon=$HOME/.local/share/icons/hicolor/256x256/apps/$version_lower.png%g" \
             "$HOME"/.local/share/applications/"$version_lower".desktop
             discord_msg "$version_upper desktop file and icon have been copied to '"$HOME"/.local/share'.\nYou can run '$save_dir/$version_lower uninstall' if you would like to remove them later." "message"
+        # TODO add message about Discord starting and removing this AppImage
         fi
     else
         discord_msg "Finished building Appimage for $version_upper version '$latest_ver'." "message"
@@ -291,6 +292,21 @@ discord_update() {
         discord_msg "Would you like to build $version_upper AppImage for version '$latest_ver'?" "question"
         if [[ "$?" != "0" ]]; then
             discord_error "$version_upper AppImage was not built." "0"
+        fi
+    fi
+    # detect previous save_dir from .desktop file
+    if [[ -f "$HOME/.local/share/applications/$version_lower.desktop" ]]; then
+        desktop_exec="$(grep -m1 '^Exec=' "$HOME"/.local/share/applications/"$version_lower".desktop | cut -f2 -d'=')"
+        # if Exec value starts with '/' and basename is version_lower, use readelf to check if is AppImage
+        if [[ "$(echo "$desktop_exec" | cut -c1)" == "/" && "$(basename "$desktop_exec")" == "$version_lower" ]]; then
+            # use readelf to check comment for AppImage and ask to use that path as save_dir
+            readelf -Wp .comment "$desktop_exec" | grep -q 'AppImage'
+            if [[ "$?" == "0" ]]; then
+                discord_msg "Previous $version_upper AppImage install detected.\nWould you like to save the new AppImage to '$desktop_exec', overwriting the previous AppImage?" "question"
+                if [[ "$?" == "0" ]]; then
+                    export save_dir="$(dirname "$desktop_exec")"
+                fi
+            fi
         fi
     fi
     # build AppImage
