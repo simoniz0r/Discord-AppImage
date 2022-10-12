@@ -300,7 +300,7 @@ discord_update() {
         if [[ "$(echo "$desktop_exec" | cut -c1)" == "/" && "$(basename "$desktop_exec")" == "$version_lower" ]]; then
             # use readelf to check comment for AppImage and ask to use that path as save_dir
             if readelf -Wp .comment "$desktop_exec" | grep -q 'AppImage'; then
-                discord_msg "Previous $version_upper AppImage install detected.\nWould you like to save the new AppImage to '$desktop_exec', overwriting the previous AppImage?" "question"
+                discord_msg "Previous $version_upper AppImage detected.\nWould you like to save $versin_upper AppImage version $latest_ver to '$desktop_exec'?\nThis will overwrite the previous $version_upper AppImage." "question"
                 if [[ "$?" == "0" ]]; then
                     export save_dir="$(dirname "$desktop_exec")"
                 fi
