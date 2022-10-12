@@ -258,7 +258,6 @@ discord_update() {
     # skip version check if $discord_build_full set to true and just build AppImage
     if [[ "$discord_build_full" != "true" ]]; then
         # get current version from ../share/"$version_lower"/resources/build_info.json
-        # get current version from ../share/"$version_lower"/resources/build_info.json
         current_ver="$(grep '"version":' "$running_dir"/../share/"$version_lower"/resources/build_info.json | cut -f4 -d'"')"
         if [[ -z "$current_ver" ]]; then
             discord_error "Error getting current $version_upper version" "1"
@@ -300,8 +299,7 @@ discord_update() {
         # if Exec value starts with '/' and basename is version_lower, use readelf to check if is AppImage
         if [[ "$(echo "$desktop_exec" | cut -c1)" == "/" && "$(basename "$desktop_exec")" == "$version_lower" ]]; then
             # use readelf to check comment for AppImage and ask to use that path as save_dir
-            readelf -Wp .comment "$desktop_exec" | grep -q 'AppImage'
-            if [[ "$?" == "0" ]]; then
+            if readelf -Wp .comment "$desktop_exec" | grep -q 'AppImage'; then
                 discord_msg "Previous $version_upper AppImage install detected.\nWould you like to save the new AppImage to '$desktop_exec', overwriting the previous AppImage?" "question"
                 if [[ "$?" == "0" ]]; then
                     export save_dir="$(dirname "$desktop_exec")"
