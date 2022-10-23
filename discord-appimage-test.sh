@@ -82,8 +82,7 @@ discord_setup() {
     discord_error "Error downloading discord-appimage.sh" "1"
     chmod +x "$HOME"/.cache/"$version_lower"-appimage/AppDir/usr/bin/discord-runner
     # download fltk-dialog (used for displaying messages)
-    # curl -skL "https://github.com/simoniz0r/Discord-AppImage/raw/main/fltk-dialog" \
-    curl -skL "https://github.com/darealshinji/fltk-dialog/releases/download/continuous/fltk-dialog" \
+    curl -skL "https://github.com/simoniz0r/Discord-AppImage/raw/master/fltk-dialog" \
     -o "$HOME"/.cache/"$version_lower"-appimage/AppDir/usr/bin/fltk-dialog || \
     discord_error "Error downloading fltk-dialog" "1"
     # make executable
