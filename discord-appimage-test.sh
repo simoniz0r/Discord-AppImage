@@ -76,10 +76,15 @@ discord_setup() {
     mkdir -p "$HOME"/.cache/"$version_lower"-appimage/debs/temp
     mkdir -p "$HOME"/.cache/"$version_lower"-appimage/AppDir/usr/bin
     # download discord-appimage.sh script to AppDir bin
-    # curl -skL "file:///home/syretia/git/Discord-AppImage/discord-appimage-test.sh" \
-    curl -skL "https://github.com/simoniz0r/Discord-AppImage/raw/master/discord-appimage-test.sh" \
-    -o "$HOME"/.cache/"$version_lower"-appimage/AppDir/usr/bin/discord-runner || \
-    discord_error "Error downloading discord-appimage.sh" "1"
+    if [[ -f "/home/syretia/git/Discord-AppImage/discord-appimage-test.sh" ]]; then
+        curl -skL "file:///home/syretia/git/Discord-AppImage/discord-appimage-test.sh" \
+        -o "$HOME"/.cache/"$version_lower"-appimage/AppDir/usr/bin/discord-runner || \
+        discord_error "Error downloading discord-appimage.sh" "1"
+    else
+        curl -skL "https://github.com/simoniz0r/Discord-AppImage/raw/master/discord-appimage-test.sh" \
+        -o "$HOME"/.cache/"$version_lower"-appimage/AppDir/usr/bin/discord-runner || \
+        discord_error "Error downloading discord-appimage.sh" "1"
+    fi
     chmod +x "$HOME"/.cache/"$version_lower"-appimage/AppDir/usr/bin/discord-runner
     # download fltk-dialog (used for displaying messages)
     curl -skL "https://github.com/simoniz0r/Discord-AppImage/raw/master/fltk-dialog" \
@@ -162,10 +167,10 @@ discord_buildappimage() {
     # create AppDir
     mkdir -p "$HOME"/.cache/"$version_lower"-appimage/AppDir
     # setup AppRun
-    echo '#!/bin/bash' > "$HOME"/.cache/"$version_lower"-appimage/AppDir/AppRun
+    echo '#!/bin/bash -x' > "$HOME"/.cache/"$version_lower"-appimage/AppDir/AppRun
     echo 'export RUNNING_DIR="$(dirname "$(readlink -f "$0")")"' >> "$HOME"/.cache/"$version_lower"-appimage/AppDir/AppRun
     echo 'export PATH="$RUNNING_DIR"/usr/bin/:"$PATH"' >> "$HOME"/.cache/"$version_lower"-appimage/AppDir/AppRun
-    echo 'export LD_LIBRARY_PATH="$RUNNING_DIR"/usr/lib/:"${LD_LIBRARY_PATH}"' >> "$HOME"/.cache/"$version_lower"-appimage/AppDir/AppRun
+    echo 'export LD_LIBRARY_PATH="$RUNNING_DIR"/usr/lib/:"$RUNNING_DIR"/usr/lib/x86_64-linux-gnu:"${LD_LIBRARY_PATH}"' >> "$HOME"/.cache/"$version_lower"-appimage/AppDir/AppRun
     echo 'discord-runner "$@"' >> "$HOME"/.cache/"$version_lower"-appimage/AppDir/AppRun
     # make executable
     chmod +x "$HOME"/.cache/"$version_lower"-appimage/AppDir/AppRun
