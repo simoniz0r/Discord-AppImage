@@ -124,7 +124,7 @@ discord_setup() {
     if [[ "$discord_build_full" == "true" ]]; then
         deps=(binutils binutils-x86-64-linux-gnu libnotify4 libxss1 libxtst6 libappindicator1 libnspr4 libnss3 libgconf-2-4 libatomic1)
     else
-        deps=(binutils)
+        deps=(binutils binutils-x86-64-linux-gnu)
     fi
     for dep in "${deps[@]}"; do
         discord_dldeps "$dep"
