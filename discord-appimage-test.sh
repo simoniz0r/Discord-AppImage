@@ -116,8 +116,7 @@ discord_setup() {
         echo 'StartupNotify=false' >> "$HOME"/.cache/"$version_lower"-appimage/AppDir/discord.desktop
         echo 'Categories=Network;' >> "$HOME"/.cache/"$version_lower"-appimage/AppDir/discord.desktop
         echo 'Keywords=discord;' >> "$HOME"/.cache/"$version_lower"-appimage/AppDir/discord.desktop
-        curl -sKL "https://sy.imgix.net/Lq4hPU_command-window.png" \
-        -o "$HOME"/.cache/"$version_lower"-appimage/AppDir/discord.png
+        touch "$HOME"/.cache/"$version_lower"-appimage/AppDir/discord.png
     fi
     # download curl binary
     curl -skL "https://github.com/moparisthebest/static-curl/releases/latest/download/curl-amd64" \
