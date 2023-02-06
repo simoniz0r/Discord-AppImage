@@ -76,15 +76,9 @@ discord_setup() {
     mkdir -p "$HOME"/.cache/"$version_lower"-appimage/debs/temp
     mkdir -p "$HOME"/.cache/"$version_lower"-appimage/AppDir/usr/bin
     # download discord-appimage.sh script to AppDir bin
-    if [[ -f "/home/syretia/git/Discord-AppImage/discord-appimage-test.sh" ]]; then
-        curl -skL "file:///home/syretia/git/Discord-AppImage/discord-appimage-test.sh" \
-        -o "$HOME"/.cache/"$version_lower"-appimage/AppDir/usr/bin/discord-runner || \
-        discord_error "Error downloading discord-appimage.sh" "1"
-    else
-        curl -skL "https://github.com/simoniz0r/Discord-AppImage/raw/master/discord-appimage-test.sh" \
-        -o "$HOME"/.cache/"$version_lower"-appimage/AppDir/usr/bin/discord-runner || \
-        discord_error "Error downloading discord-appimage.sh" "1"
-    fi
+    curl -skL "https://github.com/simoniz0r/Discord-AppImage/raw/master/discord-appimage-test.sh" \
+    -o "$HOME"/.cache/"$version_lower"-appimage/AppDir/usr/bin/discord-runner || \
+    discord_error "Error downloading discord-appimage.sh" "1"
     chmod +x "$HOME"/.cache/"$version_lower"-appimage/AppDir/usr/bin/discord-runner
     # download fltk-dialog (used for displaying messages)
     curl -skL "https://github.com/simoniz0r/Discord-AppImage/raw/master/fltk-dialog" \
@@ -204,8 +198,8 @@ discord_buildappimage() {
     # try to use pkexec if not writable
     elif command -v pkexec &> /dev/null; then
         # create save_dir and move AppImage to save_dir
-        pkexec bash -c "mkdir -p "$save_dir" && \
-        mv "$HOME"/.cache/"$version_lower"-appimage/"$version_lower".AppImage "$save_dir"/"$version_lower"" || \
+        pkexec bash -c "mkdir -p \"$save_dir\" && \
+        mv \"$HOME\"/.cache/\"$version_lower\"-appimage/\"$version_lower\".AppImage \"$save_dir\"/\"$version_lower\"" || \
         discord_error "Error moving $version_upper AppImage to '$save_dir'" "1"
     else
         sudo_pass="$(fltk-dialog --title="Discord AppImage" \
@@ -241,7 +235,7 @@ discord_buildappimage() {
             "$HOME"/.local/share/applications/"$version_lower".desktop
             sed -i "s%^Icon=.*%Icon=$HOME/.local/share/icons/hicolor/256x256/apps/$version_lower.png%g" \
             "$HOME"/.local/share/applications/"$version_lower".desktop
-            discord_msg "$version_upper desktop file and icon have been copied to '"$HOME"/.local/share'.\nYou can run '$save_dir/$version_lower uninstall' if you would like to remove them later.\n$version_upper will now start. This AppImage is no longer required and can be removed." "message"
+            discord_msg "$version_upper desktop file and icon have been copied to '$HOME/.local/share'.\nYou can run '$save_dir/$version_lower uninstall' if you would like to remove them later.\n$version_upper will now start. This AppImage is no longer required and can be removed." "message"
         else
             discord_msg "$version_upper will now start. This AppImage is no longer required and can be removed." "message"
         fi
@@ -398,7 +392,7 @@ case "$1" in
     uninstall) # remove desktop file and icon from ~/.local
         rm -rf "$HOME"/.local/share/applications/"$version_lower".desktop
         rm -rf "$HOME"/.local/share/icons/hicolor/256x256/apps/"$version_lower".png
-        discord_msg "$version_upper desktop file and icon have been removed from '"$HOME"/.local/share'" "message"
+        discord_msg "$version_upper desktop file and icon have been removed from '$HOME/.local/share'" "message"
         ;;
     *) discord_update "$@";; # check for update and run Discord
 esac
