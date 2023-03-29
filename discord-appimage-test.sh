@@ -231,7 +231,7 @@ discord_buildappimage() {
             "$HOME"/.local/share/icons/hicolor/256x256/apps/"$version_lower".png || \
             discord_error "Error copying 'discord.png' to '$HOME/.local/share/icons/hicolor/256x256/apps/$version_lower.png'" "1"
             # fix Exec and Icon lines in .desktop file
-            sed -i "s%^Exec=.*%Exec=$save_dir/$version_lower%g" \
+            sed -i "s%^Exec=.*%Exec=$save_dir/$version_lower --disable-gpu-sandbox --ignore-gpu-blocklist --disable-features=UseOzonePlatform --enable-features=VaapiVideoDecoder --use-gl=desktop --enable-gpu-rasterization --enable-zero-copy%g" \
             "$HOME"/.local/share/applications/"$version_lower".desktop
             sed -i "s%^Icon=.*%Icon=$HOME/.local/share/icons/hicolor/256x256/apps/$version_lower.png%g" \
             "$HOME"/.local/share/applications/"$version_lower".desktop
@@ -267,12 +267,12 @@ discord_update() {
             # up to date, run Discord
             echo "$version_upper is up to date."
             # run with --disable-gpu-sandbox to work around bug with Electron and glibc 2.34
-            "$running_dir"/"$version_lower" --disable-gpu-sandbox "$@"
+            "$running_dir"/"$version_lower" "$@"
             # while loop that sleeps so that internal update process works
             while true; do
                 sleep 30
                 # break if Discord is not running
-                if ! ps -x | grep -q "[/]$version_lower/Discord"; then
+                if ! pgrep -f "$usr_dir/share/$version_lower/Discord" > /dev/null; then
                     break
                 fi
             done
@@ -293,14 +293,15 @@ discord_update() {
     fi
     # detect previous save_dir from .desktop file
     if [[ -f "$HOME/.local/share/applications/$version_lower.desktop" ]]; then
-        desktop_exec="$(grep -m1 '^Exec=' "$HOME"/.local/share/applications/"$version_lower".desktop | cut -f2 -d'=')"
+        desktop_exec_path="$(grep -m1 '^Exec=' "$HOME"/.local/share/applications/"$version_lower".desktop | cut -f2 -d'=' | sed 's%\s-.*%%g')"
         # if Exec value starts with '/' and basename is version_lower, use readelf to check if is AppImage
-        if [[ "$(echo "$desktop_exec" | cut -c1)" == "/" && "$(basename "$desktop_exec")" == "$version_lower" ]]; then
+        if [[ "$(echo "$desktop_exec_path" | cut -c1)" == "/" && "$(basename "$desktop_exec_path")" == "$version_lower" ]]; then
             # use readelf to check comment for AppImage and ask to use that path as save_dir
-            if readelf -Wp .comment "$desktop_exec" | grep -q 'AppImage'; then
-                discord_msg "Existing $version_upper AppImage detected.\nWould you like to save $version_upper AppImage version $latest_ver to '$desktop_exec'?\nThis will overwrite the existing $version_upper AppImage." "question"
+            if readelf -Wp .comment "$desktop_exec_path" | grep -q 'AppImage'; then
+                discord_msg "Existing $version_upper AppImage detected.\nWould you like to save $version_upper AppImage version $latest_ver to '$desktop_exec_path'?\nThis will overwrite the existing $version_upper AppImage." "question"
                 if [[ "$?" == "0" ]]; then
-                    export save_dir="$(dirname "$desktop_exec")"
+                    export save_dir="$(dirname "$desktop_exec_path")"
+                    desktop_exec="$(grep -m1 '^Exec=' "$HOME"/.local/share/applications/"$version_lower".desktop | cut -f2- -d'=')"
                 fi
             fi
         fi
@@ -309,12 +310,17 @@ discord_update() {
     discord_buildappimage
     # run new AppImage, fork it to background, and exit
     cd "$HOME"
-    "$save_dir"/"$version_lower" "$@" & disown
+    if [[ -n "$desktop_exec" ]]; then
+        $desktop_exec "$@" & disown
+    else
+        "$save_dir"/"$version_lower" "$@" & disown
+    fi
     exit 0
 }
 
 # get dir script is running from
 export running_dir="$(dirname "$(readlink -f "$0")")"
+export usr_dir="$(dirname "$running_dir")"
 export discord_build_full="false"
 
 # get Discord version by checking for directories or input when building from distributable AppImage
