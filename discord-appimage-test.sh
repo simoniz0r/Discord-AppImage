@@ -42,12 +42,21 @@ discord_dldeps() {
     grep '<li>*..*amd64\.deb' | \
     cut -f2 -d'"' | \
     head -n 1)"
-    # exit if not found
+    # try again if not found
+    if [[ -z "$latest_deb_url" ]]; then
+        echo "Error finding download url for '$deb_name'.  Trying again..."
+        latest_deb_url="$(curl -skL "https://packages.ubuntu.com/focal/amd64/$deb_name/download" | \
+        grep '<li>*..*amd64\.deb' | \
+        cut -f2 -d'"' | \
+        head -n 1)"
+    fi    
+    # exit if not still found
     if [[ -z "$latest_deb_url" ]]; then
         discord_error "Error getting download URL for '$deb_name'" "1"
         return
     fi
-    # download latest deb
+    # download latest deb, try again if fails first time
+    curl -skL "$latest_deb_url" -o "$HOME"/.cache/"$version_lower"-appimage/debs/"$deb_name".deb || \
     curl -skL "$latest_deb_url" -o "$HOME"/.cache/"$version_lower"-appimage/debs/"$deb_name".deb || \
     discord_error "Error downloading '$deb_name' from '$latest_deb_url'" "1"
 }
