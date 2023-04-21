@@ -3,6 +3,6 @@ AppImage builds for [Discord Stable, Discord PTB, and Discord Canary](https://di
 
 To use an AppImage, just download it, `chmod a+x` the AppImage file, then run it!
 
-The AppImages listed on [the releases page](https://github.com/simoniz0r/Discord-AppImage/releases) do not actually contain the Discord client, but will build the full AppImage containing the client on first run.  After the full AppImage has been built, the AppImage downloaded from [the releases page](https://github.com/simoniz0r/Discord-AppImage/releases) can be deleted.
+The AppImages listed on [the releases page](https://github.com/simoniz0r/Discord-AppImage/releases) do not actually contain the Discord client, but will build the full AppImage containing the client on first run.  After the full AppImage has been built, the AppImage downloaded from [the releases page](https://github.com/simoniz0r/Discord-AppImage/releases) can be deleted.  The file size of the full AppImage build will be around 100MB.
 
 [Download AppImage from the releases page](https://github.com/simoniz0r/Discord-AppImage/releases)
