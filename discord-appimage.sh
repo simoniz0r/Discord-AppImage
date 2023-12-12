@@ -402,13 +402,13 @@ case "$1" in
             # up to date, run Discord
             "$bin_dir"/"$version_lower" "$@"
             # while loop that sleeps so that internal update process works
-            while true; do
-                sleep 30
+            # while true; do
+            #     sleep 30
                 # break if Discord is not running
-                if ! pgrep -f "$usr_dir/share/$version_lower/Discord" > /dev/null; then
-                    break
-                fi
-            done
+            #     if ! pgrep -f "$usr_dir/share/$version_lower/Discord" > /dev/null; then
+            #         break
+            #     fi
+            # done
         fi
         exit 0
         ;;
