@@ -311,8 +311,8 @@ discord_update() {
 
 # get dir script is running from
 export running_dir="$(dirname "$(readlink -f "$0")")"
-export bin_dir="$runningdir/usr/bin"
-export usr_dir="$runningdir/usr"
+export bin_dir="$running_dir/usr/bin"
+export usr_dir="$running_dir/usr"
 export discord_build_full="false"
 
 # export variables for runtime
