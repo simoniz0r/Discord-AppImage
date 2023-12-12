@@ -85,12 +85,12 @@ discord_setup() {
     mkdir -p "$HOME"/.cache/"$version_lower"-appimage/debs/temp
     mkdir -p "$HOME"/.cache/"$version_lower"-appimage/AppDir/usr/bin
     # download discord-appimage.sh script to AppDir bin
-    curl -skL "https://github.com/simoniz0r/Discord-AppImage/raw/master/discord-appimage.sh" \
-    -o "$HOME"/.cache/"$version_lower"-appimage/AppDir/usr/bin/discord-runner || \
+    curl -skL "https://github.com/simoniz0r/Discord-AppImage/raw/testing/discord-appimage.sh" \
+    -o "$HOME"/.cache/"$version_lower"-appimage/AppDir/AppRun || \
     discord_error "Error downloading discord-appimage.sh" "1"
-    chmod +x "$HOME"/.cache/"$version_lower"-appimage/AppDir/usr/bin/discord-runner
+    chmod +x "$HOME"/.cache/"$version_lower"-appimage/AppDir/AppRun
     # download fltk-dialog (used for displaying messages)
-    curl -skL "https://github.com/simoniz0r/Discord-AppImage/raw/master/fltk-dialog" \
+    curl -skL "https://github.com/simoniz0r/Discord-AppImage/raw/testing/fltk-dialog" \
     -o "$HOME"/.cache/"$version_lower"-appimage/AppDir/usr/bin/fltk-dialog || \
     discord_error "Error downloading fltk-dialog" "1"
     # make executable
@@ -113,7 +113,7 @@ discord_setup() {
         echo 'Name=Discord AppImage Builder' >> "$HOME"/.cache/"$version_lower"-appimage/AppDir/discord.desktop
         echo 'Comment=Builds Discord AppImages.' >> "$HOME"/.cache/"$version_lower"-appimage/AppDir/discord.desktop
         echo 'GenericName=Internet Messenger' >> "$HOME"/.cache/"$version_lower"-appimage/AppDir/discord.desktop
-        echo 'Exec=./usr/bin/discord-runner' >> "$HOME"/.cache/"$version_lower"-appimage/AppDir/discord.desktop
+        echo 'Exec=./AppRun' >> "$HOME"/.cache/"$version_lower"-appimage/AppDir/discord.desktop
         echo 'Icon=discord' >> "$HOME"/.cache/"$version_lower"-appimage/AppDir/discord.desktop
         echo 'Type=Application' >> "$HOME"/.cache/"$version_lower"-appimage/AppDir/discord.desktop
         echo 'StartupNotify=false' >> "$HOME"/.cache/"$version_lower"-appimage/AppDir/discord.desktop
@@ -168,14 +168,6 @@ discord_buildappimage() {
     fi
     # create AppDir
     mkdir -p "$HOME"/.cache/"$version_lower"-appimage/AppDir
-    # setup AppRun
-    echo '#!/bin/bash -x' > "$HOME"/.cache/"$version_lower"-appimage/AppDir/AppRun
-    echo 'export RUNNING_DIR="$(dirname "$(readlink -f "$0")")"' >> "$HOME"/.cache/"$version_lower"-appimage/AppDir/AppRun
-    echo 'export PATH="$RUNNING_DIR"/usr/bin/:"$PATH"' >> "$HOME"/.cache/"$version_lower"-appimage/AppDir/AppRun
-    echo 'export LD_LIBRARY_PATH="$RUNNING_DIR"/usr/lib/:"$RUNNING_DIR"/usr/lib/x86_64-linux-gnu:"${LD_LIBRARY_PATH}"' >> "$HOME"/.cache/"$version_lower"-appimage/AppDir/AppRun
-    echo 'discord-runner "$@"' >> "$HOME"/.cache/"$version_lower"-appimage/AppDir/AppRun
-    # make executable
-    chmod +x "$HOME"/.cache/"$version_lower"-appimage/AppDir/AppRun
     # download and extract discord and dependencies to AppDir
     discord_setup
     # write version_lower to .build_version file
@@ -225,7 +217,7 @@ discord_buildappimage() {
         kill -SIGTERM "$progress_pid"
     fi
     # if being ran from distributable AppImage, ask to create menu entry
-    if [[ "$discord_build_full" == "true" && ! -d "$running_dir/../share/$version_lower" ]]; then
+    if [[ "$discord_build_full" == "true" && ! -d "$usr_dir/share/$version_lower" ]]; then
         discord_msg "Finished building AppImage for $version_upper version '$latest_ver' to '$save_dir/$version_lower'.\n\nWould you like to create a menu entry for $version_upper?\n\n" "question"
         if [[ "$?" == "0" ]]; then
             # copy desktop file and icon to ~/.local
@@ -265,27 +257,17 @@ discord_update() {
     # skip version check if $discord_build_full set to true and just build AppImage
     if [[ "$discord_build_full" != "true" ]]; then
         # get current version from ../share/"$version_lower"/resources/build_info.json
-        current_ver="$(grep '"version":' "$running_dir"/../share/"$version_lower"/resources/build_info.json | cut -f4 -d'"')"
+        current_ver="$(grep '"version":' "$bin_dir"/../share/"$version_lower"/resources/build_info.json | cut -f4 -d'"')"
         if [[ -z "$current_ver" ]]; then
             discord_error "Error getting current $version_upper version" "1"
         fi
         echo "Current version: $current_ver"
         echo "Latest version: $latest_ver"
-        # check if versions match and return if they do
+        # check if versions match
         if [[ "$current_ver" == "$latest_ver" ]]; then
-            # up to date, run Discord
+            # up to date, return 101 so discord is ran
             echo "$version_upper is up to date."
-            # run with --disable-gpu-sandbox to work around bug with Electron and glibc 2.34
-            "$running_dir"/"$version_lower" "$@"
-            # while loop that sleeps so that internal update process works
-            while true; do
-                sleep 30
-                # break if Discord is not running
-                if ! pgrep -f "$usr_dir/share/$version_lower/Discord" > /dev/null; then
-                    break
-                fi
-            done
-            exit 0
+            return 101
         fi
         # versions did not match, so build new AppImage
         discord_msg "New $version_upper version '$latest_ver' is available.\nUpdate now?" "question"
@@ -329,21 +311,26 @@ discord_update() {
 
 # get dir script is running from
 export running_dir="$(dirname "$(readlink -f "$0")")"
-export usr_dir="$(dirname "$running_dir")"
+export bin_dir="$runningdir/usr/bin"
+export usr_dir="$runningdir/usr"
 export discord_build_full="false"
+
+# export variables for runtime
+export PATH="$running_dir"/usr/bin/:"$PATH"
+export LD_LIBRARY_PATH="$running_dir"/usr/lib/:"$running_dir"/usr/lib/x86_64-linux-gnu:"${LD_LIBRARY_PATH}"
 
 # get Discord version by checking for directories or input when building from distributable AppImage
 # Discord Stable
-if [[ -d "$running_dir/../share/discord" ]]; then
+if [[ -d "$usr_dir/share/discord" ]]; then
     export version_lower="discord"
     export version_upper="Discord"
     export version_url="https://discord.com/api/download?format=deb&platform=linux"
 # Discord Insiders
-elif [[ -d "$running_dir/../share/discord-ptb" ]]; then
+elif [[ -d "$usr_dir/share/discord-ptb" ]]; then
     export version_lower="discord-ptb"
     export version_upper="Discord PTB"
     export version_url="https://discord.com/api/download/ptb?format=deb&platform=linux"
-elif [[ -d "$running_dir/../share/discord-canary" ]]; then
+elif [[ -d "$usr_dir/share/discord-canary" ]]; then
     export version_lower="discord-canary"
     export version_upper="Discord Canary"
     export version_url="https://discord.com/api/download/canary?format=deb&platform=linux"
@@ -351,7 +338,7 @@ else
     if [[ "$1" != "build-distrib" ]]; then
         export discord_build_full="true"
         # full AppImage has not been built, detect which version to build
-        build_version="$(cat "$running_dir"/.build_version)"
+        build_version="$(cat "$bin_dir"/.build_version)"
         case "$build_version" in
             discord) # Discord Stable
                 export version_lower="discord"
@@ -409,5 +396,20 @@ case "$1" in
         rm -rf "$HOME"/.local/share/icons/hicolor/256x256/apps/"$version_lower".png
         discord_msg "$version_upper desktop file and icon have been removed from '$HOME/.local/share'" "message"
         ;;
-    *) discord_update "$@";; # check for update and run Discord
+    *) # check for update and run Discord
+        discord_update "$@"
+        if [[ "$?" == "101" ]]; then
+            # up to date, run Discord
+            "$bin_dir"/"$version_lower" "$@"
+            # while loop that sleeps so that internal update process works
+            while true; do
+                sleep 30
+                # break if Discord is not running
+                if ! pgrep -f "$usr_dir/share/$version_lower/Discord" > /dev/null; then
+                    break
+                fi
+            done
+        fi
+        exit 0
+        ;;
 esac
