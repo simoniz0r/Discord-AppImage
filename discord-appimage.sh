@@ -129,7 +129,7 @@ discord_setup() {
     chmod +x "$HOME"/.cache/"$version_lower"-appimage/AppDir/usr/bin/curl
     # download and extract Discord's deps
     if [[ "$discord_build_full" == "true" ]]; then
-        deps=(binutils binutils-x86-64-linux-gnu libbinutils libctf-nobfd0 libnotify4 libxss1 libxtst6 libappindicator1 libnspr4 libnss3 libgconf-2-4 libatomic1)
+        deps=(binutils binutils-x86-64-linux-gnu libbinutils libctf-nobfd0 libnotify4 libxss1 libxtst6 libappindicator1 libatomic1)
     else
         deps=(binutils binutils-x86-64-linux-gnu libbinutils libctf-nobfd0)
     fi
