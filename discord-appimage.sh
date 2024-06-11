@@ -240,7 +240,7 @@ discord_buildappimage() {
             "$HOME"/.local/share/icons/hicolor/256x256/apps/"$version_lower".png || \
             discord_error "Error copying 'discord.png' to '$HOME/.local/share/icons/hicolor/256x256/apps/$version_lower.png'" "1"
             # fix Exec and Icon lines in .desktop file
-            sed -i "s%^Exec=.*%Exec=$save_dir/$version_lower --disable-gpu-sandbox --ignore-gpu-blocklist --disable-features=UseOzonePlatform --enable-features=VaapiVideoDecoder --use-gl=desktop --enable-gpu-rasterization --enable-zero-copy%g" \
+            sed -i "s%^Exec=.*%Exec=$save_dir/$version_lower%g" \
             "$HOME"/.local/share/applications/"$version_lower".desktop
             sed -i "s%^Icon=.*%Icon=$HOME/.local/share/icons/hicolor/256x256/apps/$version_lower.png%g" \
             "$HOME"/.local/share/applications/"$version_lower".desktop
