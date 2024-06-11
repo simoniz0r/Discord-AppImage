@@ -34,18 +34,18 @@ discord_error() {
     exit "$2"
 }
 
-# function to find latest debs from Ubuntu's site for building AppImage
+# function to find latest debs from Debian's site for building AppImage
 discord_dldeps() {
     deb_name="$1"
     # find latest deb url using grep and head -n 1
-    latest_deb_url="$(curl -skL "https://packages.ubuntu.com/focal/amd64/$deb_name/download" | \
+    latest_deb_url="$(curl -skL "https://packages.debian.org/bullseye/amd64/$deb_name/download" | \
     grep '<li>*..*amd64\.deb' | \
     cut -f2 -d'"' | \
     head -n 1)"
     # try again if not found
     if [[ -z "$latest_deb_url" ]]; then
         echo "Error finding download url for '$deb_name'.  Trying again..."
-        latest_deb_url="$(curl -skL "https://packages.ubuntu.com/focal/amd64/$deb_name/download" | \
+        latest_deb_url="$(curl -skL "https://packages.debian.org/bullseye/amd64/$deb_name/download" | \
         grep '<li>*..*amd64\.deb' | \
         cut -f2 -d'"' | \
         head -n 1)"
@@ -129,7 +129,7 @@ discord_setup() {
     chmod +x "$HOME"/.cache/"$version_lower"-appimage/AppDir/usr/bin/curl
     # download and extract Discord's deps
     if [[ "$discord_build_full" == "true" ]]; then
-        deps=(binutils binutils-x86-64-linux-gnu libbinutils libctf-nobfd0 libnotify4 libxss1 libxtst6 libappindicator1 libatomic1)
+        deps=(binutils binutils-x86-64-linux-gnu libbinutils libctf-nobfd0 libnotify4 libxss1 libxtst6 libayatana-appindicator1 libatomic1)
     else
         deps=(binutils binutils-x86-64-linux-gnu libbinutils libctf-nobfd0)
     fi
